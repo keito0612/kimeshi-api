@@ -5,6 +5,7 @@ import { HistoryRepository } from '../repositories/history'
 import { UserRepository } from '../repositories/user'
 import { ApiError } from '../utils/error'
 import { ApiResponse } from '../utils/response'
+import { getEnv } from '../utils/env'
 
 type Bindings = {
   NODE_ENV?: string
@@ -22,8 +23,9 @@ historyRoute.get('/', async (c) => {
     throw ApiError.badRequest('MISSING_DEVICE_ID', 'X-Device-ID header is required')
   }
 
-  const userRepo = new UserRepository(c.env)
-  const historyRepo = new HistoryRepository(c.env)
+  const env = getEnv(c.env)
+  const userRepo = new UserRepository(env)
+  const historyRepo = new HistoryRepository(env)
 
   const user = await userRepo.findByDeviceId(deviceId)
 
@@ -43,8 +45,9 @@ historyRoute.post('/', zValidator('json', createHistorySchema), async (c) => {
     throw ApiError.badRequest('MISSING_DEVICE_ID', 'X-Device-ID header is required')
   }
 
-  const userRepo = new UserRepository(c.env)
-  const historyRepo = new HistoryRepository(c.env)
+  const env = getEnv(c.env)
+  const userRepo = new UserRepository(env)
+  const historyRepo = new HistoryRepository(env)
 
   const data = c.req.valid('json')
   const user = await userRepo.findOrCreate(deviceId)
@@ -62,8 +65,9 @@ historyRoute.delete('/:id', async (c) => {
     throw ApiError.badRequest('MISSING_DEVICE_ID', 'X-Device-ID header is required')
   }
 
-  const userRepo = new UserRepository(c.env)
-  const historyRepo = new HistoryRepository(c.env)
+  const env = getEnv(c.env)
+  const userRepo = new UserRepository(env)
+  const historyRepo = new HistoryRepository(env)
 
   const user = await userRepo.findByDeviceId(deviceId)
 
