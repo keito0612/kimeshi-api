@@ -1,7 +1,6 @@
 name = "kimeshi-api"
 main = "src/index.ts"
 compatibility_date = "2024-01-01"
-HOTPEPPER_API_KEY=d1726c0837d355ff
 
 [vars]
 NODE_ENV = "production"
