@@ -77,7 +77,7 @@ export class HotpepperService {
       lng: params.lng.toString(),
       range: getRange(params.radius).toString(),
       format: 'json',
-      count: '100',
+      count: params.limit.toString(),
     })
 
     if (params.budget && params.budget !== 'unlimited') {

@@ -7,6 +7,7 @@ export const suggestQuerySchema = z.object({
   genre: z.string().optional(),
   radius: z.coerce.number().min(100).max(3000).default(1000),
   exclude: z.string().optional(),
+  limit: z.coerce.number().min(1).max(100).default(50),
 })
 
 export const restaurantSchema = z.object({
