@@ -5,14 +5,18 @@ import { HotpepperService } from '../services/hotpepper'
 import { ApiError } from '../utils/error'
 import { ApiResponse } from '../utils/response'
 
-export const restaurantsRoute = new Hono()
+type Bindings = {
+  HOTPEPPER_API_KEY: string
+}
+
+export const restaurantsRoute = new Hono<{ Bindings: Bindings }>()
 
 restaurantsRoute.get(
   '/suggest',
   zValidator('query', suggestQuerySchema),
   async (c) => {
     const params = c.req.valid('query')
-    const apiKey = process.env.HOTPEPPER_API_KEY
+    const apiKey = c.env.HOTPEPPER_API_KEY
 
     if (!apiKey) {
       throw ApiError.internal('CONFIG_ERROR', 'HOTPEPPER_API_KEY is not configured')
@@ -42,7 +46,7 @@ restaurantsRoute.get(
 
 restaurantsRoute.get('/:id', async (c) => {
   const id = c.req.param('id')
-  const apiKey = process.env.HOTPEPPER_API_KEY
+  const apiKey = c.env.HOTPEPPER_API_KEY
 
   if (!apiKey) {
     throw ApiError.internal('CONFIG_ERROR', 'HOTPEPPER_API_KEY is not configured')

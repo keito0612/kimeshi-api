@@ -4,12 +4,18 @@ import { PrismaClient } from '@prisma/client'
 
 let prisma: PrismaClient | null = null
 
-const isDevelopment = process.env.NODE_ENV !== 'production'
+export type DbEnv = {
+  NODE_ENV?: string
+  TURSO_DATABASE_URL?: string
+  TURSO_AUTH_TOKEN?: string
+}
 
-export function getPrisma(): PrismaClient {
+export function getPrisma(env: DbEnv = {}): PrismaClient {
   if (prisma) return prisma
 
-  if (isDevelopment && !process.env.TURSO_DATABASE_URL) {
+  const isDevelopment = env.NODE_ENV !== 'production'
+
+  if (isDevelopment && !env.TURSO_DATABASE_URL) {
     // 開発環境: ローカルSQLiteを使用
     const libsql = createClient({
       url: 'file:./prisma/dev.db',
@@ -18,8 +24,8 @@ export function getPrisma(): PrismaClient {
     prisma = new PrismaClient({ adapter })
   } else {
     // 本番環境: Tursoを使用
-    const url = process.env.TURSO_DATABASE_URL
-    const authToken = process.env.TURSO_AUTH_TOKEN
+    const url = env.TURSO_DATABASE_URL
+    const authToken = env.TURSO_AUTH_TOKEN
 
     if (!url) {
       throw new Error('TURSO_DATABASE_URL is not configured')

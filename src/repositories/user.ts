@@ -1,4 +1,4 @@
-import { getPrisma } from '../db/client'
+import { getPrisma, type DbEnv } from '../db/client'
 
 export interface User {
   id: string
@@ -8,8 +8,10 @@ export interface User {
 }
 
 export class UserRepository {
+  constructor(private env: DbEnv = {}) {}
+
   async findByDeviceId(deviceId: string): Promise<User | null> {
-    const prisma = getPrisma()
+    const prisma = getPrisma(this.env)
 
     const user = await prisma.user.findUnique({
       where: { deviceId },
@@ -26,7 +28,7 @@ export class UserRepository {
   }
 
   async create(deviceId: string): Promise<User> {
-    const prisma = getPrisma()
+    const prisma = getPrisma(this.env)
 
     const user = await prisma.user.create({
       data: { deviceId },

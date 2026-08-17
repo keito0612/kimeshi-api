@@ -1,9 +1,11 @@
-import { getPrisma } from '../db/client'
+import { getPrisma, type DbEnv } from '../db/client'
 import type { CreateHistory, History } from '../schemas/history'
 
 export class HistoryRepository {
+  constructor(private env: DbEnv = {}) {}
+
   async create(userId: string, data: CreateHistory): Promise<History> {
-    const prisma = getPrisma()
+    const prisma = getPrisma(this.env)
 
     const history = await prisma.history.create({
       data: {
@@ -27,7 +29,7 @@ export class HistoryRepository {
   }
 
   async findByUserId(userId: string, limit = 50): Promise<History[]> {
-    const prisma = getPrisma()
+    const prisma = getPrisma(this.env)
 
     const histories = await prisma.history.findMany({
       where: { userId },
@@ -47,7 +49,7 @@ export class HistoryRepository {
   }
 
   async delete(id: string, userId: string): Promise<boolean> {
-    const prisma = getPrisma()
+    const prisma = getPrisma(this.env)
 
     try {
       await prisma.history.delete({

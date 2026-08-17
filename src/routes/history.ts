@@ -6,10 +6,13 @@ import { UserRepository } from '../repositories/user'
 import { ApiError } from '../utils/error'
 import { ApiResponse } from '../utils/response'
 
-export const historyRoute = new Hono()
+type Bindings = {
+  NODE_ENV?: string
+  TURSO_DATABASE_URL?: string
+  TURSO_AUTH_TOKEN?: string
+}
 
-const historyRepo = new HistoryRepository()
-const userRepo = new UserRepository()
+export const historyRoute = new Hono<{ Bindings: Bindings }>()
 
 // 履歴一覧取得
 historyRoute.get('/', async (c) => {
@@ -18,6 +21,9 @@ historyRoute.get('/', async (c) => {
   if (!deviceId) {
     throw ApiError.badRequest('MISSING_DEVICE_ID', 'X-Device-ID header is required')
   }
+
+  const userRepo = new UserRepository(c.env)
+  const historyRepo = new HistoryRepository(c.env)
 
   const user = await userRepo.findByDeviceId(deviceId)
 
@@ -37,6 +43,9 @@ historyRoute.post('/', zValidator('json', createHistorySchema), async (c) => {
     throw ApiError.badRequest('MISSING_DEVICE_ID', 'X-Device-ID header is required')
   }
 
+  const userRepo = new UserRepository(c.env)
+  const historyRepo = new HistoryRepository(c.env)
+
   const data = c.req.valid('json')
   const user = await userRepo.findOrCreate(deviceId)
   const history = await historyRepo.create(user.id, data)
@@ -52,6 +61,9 @@ historyRoute.delete('/:id', async (c) => {
   if (!deviceId) {
     throw ApiError.badRequest('MISSING_DEVICE_ID', 'X-Device-ID header is required')
   }
+
+  const userRepo = new UserRepository(c.env)
+  const historyRepo = new HistoryRepository(c.env)
 
   const user = await userRepo.findByDeviceId(deviceId)
 
